@@ -8,6 +8,9 @@ public class Tabuleiro {
 //construtor
 
     public Tabuleiro(int linhas, int colunas){
+        if (linhas < 1 || colunas < 1){ //programacao defensivas ao criar o tabuleiro
+            throw new TempoExcecao("ERRO criando o tabuleiro: É necessario que haja pelo menos 1 linha e 1 coluna");
+        }
         this.linhas = linhas;
         this.colunas = colunas;
         pecas = new Peca[linhas][colunas]; // matriz vai ser instanciada pela qtd de linhas e colunas informadas
@@ -19,29 +22,46 @@ public class Tabuleiro {
         return linhas;
     }
 
-    public void setLinhas(int linhas){
-        this.linhas = linhas;
-    }
-
     public int getColunas(){
         return colunas;
     }
 
-    public void setColunas(int colunas){
-        this.colunas = colunas;
-    }
-
+    //verificando se posicao existe
     public Peca peca(int linha, int coluna){
+        if(!posicaoExiste(linha, coluna)){
+            throw new TempoExcecao("Posicao não EXISTE");
+        }
         return pecas[linha][coluna];
     }
 
     public Peca peca(Posicao posicao){
+        if(!posicaoExiste(posicao)){
+            throw new TempoExcecao("Posicao não EXISTE");
+        }
         return pecas[posicao.getlinha()][posicao.getcoluna()];
     }
 
     // colocando pecas no tabuleiro
     public void entradaPeca(Peca peca, Posicao posicao){
+        if (posicaoOcupada(posicao)) {//verificando se ja existe uma peca nessa posicao
+            throw new TempoExcecao("POSICÃO " + posicao + " JÁ EM USO ");
+        }
         pecas[posicao.getlinha()][posicao.getcoluna()] = peca;
         peca.posicao = posicao;
+    }
+
+    private boolean posicaoExiste(int linha, int coluna){ //codicao para ver se uma posicao existe dentro do tabuleiro
+        return linha >= 0 && linha < linhas && coluna >= 0 && coluna < colunas;
+    }
+
+    public boolean posicaoExiste(Posicao posicao){
+        return posicaoExiste(posicao.getlinha(), posicao.getcoluna());
+    }
+
+    public boolean posicaoOcupada(Posicao posicao){ //codicao para verificar se existe uma peca nessa posicao
+        if(!posicaoExiste(posicao)){
+            throw new TempoExcecao("Posicao não EXISTE");
+        }
+        return peca(posicao) != null;
     }
 }
