@@ -1,4 +1,4 @@
-package Tabuleiro;
+package tabuleiro;
 
 public class Posicao {
     private int linha;
@@ -30,3 +30,4 @@ public void setcoluna(int coluna){
         return linha + ", " + coluna;
     }
 }
+
