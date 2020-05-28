@@ -9,29 +9,42 @@ import xadrez.pecas.Torre;
 public class PartidaXadrez {
     private Tabuleiro tabuleiro; //importar tabuleiro aqui
 
-    public  PartidaXadrez(){
+    public PartidaXadrez() {
         tabuleiro = new Tabuleiro(8, 8); //dimensão do tabuleiro
         iniciarPartida(); //chamando a peca
     }
 
-    public PecaXadrez[][] getPecas(){ // retorna uma matriz de peças
+    public PecaXadrez[][] getPecas() { // retorna uma matriz de peças
         PecaXadrez[][] mat = new PecaXadrez[tabuleiro.getLinhas()][tabuleiro.getColunas()];
-        for (int i=0; i<tabuleiro.getLinhas(); i++ ){//percorrendo as linhas da matriz
-            for (int j=0; j<tabuleiro.getColunas(); j++ ){//percorrendo as colunas da matriz
-                mat[i][j] = (PecaXadrez)tabuleiro.peca(i, j);
+        for (int i = 0; i < tabuleiro.getLinhas(); i++) {//percorrendo as linhas da matriz
+            for (int j = 0; j < tabuleiro.getColunas(); j++) {//percorrendo as colunas da matriz
+                mat[i][j] = (PecaXadrez) tabuleiro.peca(i, j);
             }
         }
         return mat;
     }
+
     //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
-    private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca){
+    private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
         tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
     }
+
     // colocando as pecas no tabuleiro
     //instanciando as pecas de xadrez
-    private void iniciarPartida(){
-        entradaNovaPeca('b', 6, new Torre(tabuleiro, Cor.WHITE)); // posicao das pecas na posicao do xadrez
-        entradaNovaPeca('e', 8, new Rei(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('e', 1, new Torre(tabuleiro, Cor.BLACK));
+    private void iniciarPartida() {
+        // posicao das pecas na posicao do xadrez
+        entradaNovaPeca('c', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('c', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 1, new Rei(tabuleiro, Cor.WHITE));
+
+        entradaNovaPeca('c', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('c', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 8, new Rei(tabuleiro, Cor.BLACK));
     }
 }
