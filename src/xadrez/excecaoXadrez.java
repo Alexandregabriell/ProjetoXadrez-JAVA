@@ -1,9 +1,13 @@
 package xadrez;
-//Criando uma excecao na camada de xadrez
-public class excecaoXadrez extends RuntimeException{
-    private static final long serialVersioUID = 1L;// numero de serial padrao
 
-    public  excecaoXadrez(String msg){
+import tabuleiro.Tabuleiro;
+import tabuleiro.TabuleiroExcecao;
+
+//Criando uma excecao na camada de xadrez
+public class excecaoXadrez extends TabuleiroExcecao {
+    private static final long serialVersionUID = 1L;
+
+    public excecaoXadrez(String msg) {
         super(msg);
     }
 }

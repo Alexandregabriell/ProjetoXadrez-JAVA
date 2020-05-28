@@ -38,7 +38,7 @@ public class posicaoXadrez {
 
     //implementando posicao inversa da matriz
     protected static posicaoXadrez fromPosicao(Posicao posicao){// retornando  a formula inversa de Posicao
-        return new posicaoXadrez((char)('a' - posicao.getcoluna()), (8 - posicao.getlinha()));
+        return new posicaoXadrez((char)('a' - posicao.getcoluna()), 8 - posicao.getlinha());
     }
 
     //imprimindo posicao do xadrez na ordem

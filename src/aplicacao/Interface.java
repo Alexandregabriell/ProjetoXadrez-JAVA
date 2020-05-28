@@ -3,6 +3,10 @@ package aplicacao;
 
 import xadrez.Cor;
 import xadrez.PecaXadrez;
+import xadrez.posicaoXadrez;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Interface {
     // codigos de cores para imprimir
@@ -28,11 +32,24 @@ public class Interface {
     public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
-    public static void printTabuleiro(PecaXadrez[][]pecas){
+    // metodo para ler posicao do usuario
+    public static posicaoXadrez lendoPosicaoXadrez(Scanner sc) { // Recebe como argumento o scanner instaciado do programa principal
+        try { // evitando problema de formato
+            // lendo posicao do xadrez
+            String s = sc.nextLine();
+            char coluna = s.charAt(0);
+            int linha = Integer.parseInt(s.substring(1));// recortando string apartir da posicao 1
+            return new posicaoXadrez(coluna, linha);
+        }
+        catch (RuntimeException e){ // excecao, erro entrada de dados
+            throw new InputMismatchException(" ERRO NA POSICAO DE XADREZ - VALORES VALIDOS DE A1 ATÉ H8.");
+        }
+    }
+    public static void imprimirTabuleiro(PecaXadrez[][]pecas){
         for (int i=0; i<pecas.length; i++){ //percorrer a matriz para imprimir tabuleiro
             System.out.print((8 - i) + " ");
             for (int j=0; j<pecas.length; j++){
-                printPeca(pecas[i][j]);
+                imprimirPeca(pecas[i][j]);
             }
             System.out.println(); // quebra de linha
         }
@@ -40,7 +57,7 @@ public class Interface {
     }
 
     //imprimindo uma peça, verificando sua  cor
-    private static void printPeca(PecaXadrez peca) {
+    private static void imprimirPeca(PecaXadrez peca) {
         if (peca == null) {
             System.out.print("-");
         } else {

@@ -1,5 +1,7 @@
 package xadrez;
 
+import tabuleiro.Peca;
+import tabuleiro.Posicao;
 import tabuleiro.Tabuleiro;
 import xadrez.pecas.Rei;
 import xadrez.pecas.Torre;
@@ -24,9 +26,35 @@ public class PartidaXadrez {
         return mat;
     }
 
+    // Metodo para retirar a peca da posicao de origem e colocar na posicao de destino
+    public PecaXadrez movimentoXadrez(posicaoXadrez origemPosicao, posicaoXadrez destinoPosicao){
+        Posicao origem = origemPosicao.toPosicao();// convertendo para posicao da matriz
+        Posicao destino = destinoPosicao.toPosicao();
+        ValidateSourcePosicao(origem);//validando posicao de origem
+        Peca capturaPeca = movendoPeca(origem, destino); //recebe resultado da operaca movendo peca, que vai realizar o movimento da peca
+        return (PecaXadrez)capturaPeca;
+    }
+
+    // removendo pecas
+    public Peca movendoPeca(Posicao origem, Posicao destino){
+        Peca p = tabuleiro.removePeca(origem); // removendo peca de origem
+        Peca capturaPreca = tabuleiro.removePeca(destino); // removendo possivel peca de origem
+        tabuleiro.entradaPeca(p, destino); // colocando a peca na posicao de destino
+        return capturaPreca;
+    }
+
+        // verificando se existe peca na posicao de origem
+        private void ValidateSourcePosicao(Posicao posicao){
+            if (!tabuleiro.posicaoOcupada(posicao)){
+                throw new excecaoXadrez (" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
+            }
+        }
+
+
     //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
     private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
         tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
+
     }
 
     // colocando as pecas no tabuleiro
