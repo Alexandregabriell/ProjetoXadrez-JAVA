@@ -48,8 +48,10 @@ public class PartidaXadrez {
             if (!tabuleiro.posicaoOcupada(posicao)){
                 throw new excecaoXadrez (" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
             }
+            if (!tabuleiro.peca(posicao).existeMovimentoPossivel()) { // testando se ha movimentos possiveis para a peca escolhida
+                throw new excecaoXadrez(" Não existe movimentos possíveis para a peça escolhida. ");
+            }
         }
-
 
     //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
     private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
