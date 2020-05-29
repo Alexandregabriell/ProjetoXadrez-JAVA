@@ -25,6 +25,12 @@ public void setcoluna(int coluna){
     this.coluna = coluna;
     }
 
+    // atualiza valores de uma posicao
+    public void setValores(int linha, int coluna) {
+        this.linha = linha;
+        this.coluna = coluna;
+    }
+
 @Override
     public String toString(){
         return linha + ", " + coluna;
