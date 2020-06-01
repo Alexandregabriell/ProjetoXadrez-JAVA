@@ -62,7 +62,7 @@ public class PartidaXadrez {
 
     private void validaPosicaoDestino(Posicao origem, Posicao destino) {
         if (!tabuleiro.peca(origem).possivelMovimento(destino)) {
-            throw new excecaoXadrez(" A peça escolhida não pode ser movida para a posição escolhida. ");
+            throw new excecaoXadrez(" A peça selecionada não pode ser movida para a posição escolhida. ");
         }
     }
         //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]

@@ -77,7 +77,7 @@ public class Interface {
 
         //imprimindo uma peça, verificando sua  cor
         private static void imprimirPeca (PecaXadrez peca, boolean fundo){
-            if (fundo) { // testando se a variavel(background) é verdadeira
+            if (fundo) { // testando se a variavel(fundo) é verdadeira
                 System.out.print(ANSI_BLUE_BACKGROUND);
             }
 
