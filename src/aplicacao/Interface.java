@@ -52,28 +52,44 @@ public class Interface {
             throw new InputMismatchException(" ERRO NA POSICAO DE XADREZ - VALORES VALIDOS DE A1 ATÉ H8.");
         }
     }
-    public static void imprimirTabuleiro(PecaXadrez[][]pecas){
-        for (int i=0; i<pecas.length; i++){ //percorrer a matriz para imprimir tabuleiro
-            System.out.print((8 - i) + " ");
-            for (int j=0; j<pecas.length; j++){
-                imprimirPeca(pecas[i][j]);
+
+        public static void imprimirTabuleiro (PecaXadrez[][] pecas){
+            for (int i = 0; i < pecas.length; i++) { //percorrer a matriz para imprimir tabuleiro
+                System.out.print((8 - i) + " ");
+                for (int j = 0; j < pecas.length; j++) {
+                    imprimirPeca(pecas[i][j], false); // false para que nenhuma tenha o fundo colorido
+                }
+                System.out.println(); // quebra de linha
             }
-            System.out.println(); // quebra de linha
+            System.out.println("  a b c d e f g h");
+        }
+
+    public static void imprimirTabuleiro(PecaXadrez[][] pecas, boolean[][] possivelMovimento) { // matriz de movimentos possiveis
+        for (int i = 0; i < pecas.length; i++) {
+            System.out.print((8 - i) + " ");
+            for (int j = 0; j < pecas.length; j++) {
+                imprimirPeca(pecas[i][j], possivelMovimento[i][j]); // imprindo o fundo colorido dependendo da variavel[][]
+            }
+            System.out.println();
         }
         System.out.println("  a b c d e f g h");
     }
 
-    //imprimindo uma peça, verificando sua  cor
-    private static void imprimirPeca(PecaXadrez peca) {
-        if (peca == null) {
-            System.out.print("-");
-        } else {
-            if (peca.getCor() == Cor.WHITE) {
-                System.out.print(ANSI_WHITE + peca + ANSI_RESET);
-            } else {
-                System.out.print(ANSI_YELLOW + peca + ANSI_RESET);
+        //imprimindo uma peça, verificando sua  cor
+        private static void imprimirPeca (PecaXadrez peca, boolean fundo){
+            if (fundo) { // testando se a variavel(background) é verdadeira
+                System.out.print(ANSI_BLUE_BACKGROUND);
             }
+
+            if (peca == null) {
+                System.out.print("-" + ANSI_RESET);
+            } else {
+                if (peca.getCor() == Cor.WHITE) {
+                    System.out.print(ANSI_WHITE + peca + ANSI_RESET);
+                } else {
+                    System.out.print(ANSI_YELLOW + peca + ANSI_RESET);
+                }
+            }
+            System.out.print(" ");
         }
-        System.out.print(" ");
     }
-}

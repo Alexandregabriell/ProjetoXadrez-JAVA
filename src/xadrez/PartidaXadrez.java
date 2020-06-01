@@ -26,6 +26,12 @@ public class PartidaXadrez {
         return mat;
     }
 
+    public boolean[][] possivelMovimento(posicaoXadrez origemPosicao) {
+        Posicao posicao = origemPosicao.toPosicao(); // posicao de matriz normal
+        validaPosicaoOrigem(posicao); // validando posicao de origem
+        return tabuleiro.peca(posicao).possivelMovimento(); // retorna possivel movimento da peca escolhida
+    }
+
     // Metodo para retirar a peca da posicao de origem e colocar na posicao de destino
     public PecaXadrez movimentoXadrez(posicaoXadrez origemPosicao, posicaoXadrez destinoPosicao) {
         Posicao origem = origemPosicao.toPosicao();// convertendo para posicao da matriz
