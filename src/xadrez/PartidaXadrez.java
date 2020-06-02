@@ -9,11 +9,23 @@ import xadrez.pecas.Torre;
 //É onde tera as regras do jogo
 
 public class PartidaXadrez {
+    private int turno;
+    private Cor jogadorAtual;
     private Tabuleiro tabuleiro; //importar tabuleiro aqui
 
     public PartidaXadrez() {
         tabuleiro = new Tabuleiro(8, 8); //dimensão do tabuleiro
+        turno = 1; // representado partida que esta
+        jogadorAtual = Cor.WHITE;
         iniciarPartida(); //chamando a peca
+    }
+
+    public int getTurno() {
+        return turno;
+    }
+
+    public Cor getJogadorAtual() {
+        return jogadorAtual;
     }
 
     public PecaXadrez[][] getPecas() { // retorna uma matriz de peças
@@ -39,6 +51,7 @@ public class PartidaXadrez {
         validaPosicaoOrigem(origem);//validando posicao de origem
         validaPosicaoDestino(origem, destino);
         Peca capturaPeca = movendoPeca(origem, destino); //recebe resultado da operaca movendo peca, que vai realizar o movimento da peca
+        proximoTurno();
         return (PecaXadrez) capturaPeca;
     }
 
@@ -55,6 +68,10 @@ public class PartidaXadrez {
         if (!tabuleiro.posicaoOcupada(posicao)) {
             throw new excecaoXadrez(" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
         }
+        if (jogadorAtual != ((PecaXadrez)tabuleiro.peca(posicao)).getCor()) {
+            throw new excecaoXadrez(" A PECA ESCOLHIDA É DO ADVERSARIO");
+        }
+
         if (!tabuleiro.peca(posicao).existeMovimentoPossivel()) { // testando se ha movimentos possiveis para a peca escolhida
             throw new excecaoXadrez(" Não existe movimentos possíveis para a peça escolhida. ");
         }
@@ -65,6 +82,12 @@ public class PartidaXadrez {
             throw new excecaoXadrez(" A peça selecionada não pode ser movida para a posição escolhida. ");
         }
     }
+
+    private void proximoTurno() {
+        turno++;
+        jogadorAtual = (jogadorAtual == Cor.WHITE) ? Cor.BLACK : Cor.WHITE; // condicao ternaria, trocando cor
+    }
+
         //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
         private void entradaNovaPeca( char coluna, int linha, PecaXadrez peca){
             tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz

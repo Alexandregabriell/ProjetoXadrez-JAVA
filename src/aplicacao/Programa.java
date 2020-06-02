@@ -18,7 +18,7 @@ public class Programa {
 		while (true) {
 		    try { // trantando excecao
                 Interface.clearScreen();
-                Interface.imprimirTabuleiro(partidaXadrez.getPecas()); // imprimir tabuleiro na tela
+                Interface.imprimirPartida(partidaXadrez); // imprimir tabuleiro na tela
                 System.out.println();
                 System.out.print("Origem: "); // usuario entra com a posicao de origem
                 posicaoXadrez origem = Interface.lendoPosicaoXadrez(sc);
