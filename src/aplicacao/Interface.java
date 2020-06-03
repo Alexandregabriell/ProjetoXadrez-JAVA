@@ -6,8 +6,11 @@ import xadrez.PartidaXadrez;
 import xadrez.PecaXadrez;
 import xadrez.posicaoXadrez;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Interface {
     // codigos de cores para imprimir
@@ -54,9 +57,10 @@ public class Interface {
         }
     }
 
-    public static void imprimirPartida(PartidaXadrez partidaXadrez) {
-        imprimirTabuleiro(partidaXadrez.getPecas());
+    public static void imprimirPartida(PartidaXadrez partidaXadrez, List<PecaXadrez> capturada) {
+        imprimirTabuleiro(partidaXadrez.getPecas());// imprimindo o tabuleiro
         System.out.println();
+        imprimirPecasCapturadas(capturada); // imprimindo pecas capturadas
         System.out.println("Turno : " + partidaXadrez.getTurno());
         System.out.println("Aguardando o Jogador : " + partidaXadrez.getJogadorAtual());
     }
@@ -84,7 +88,7 @@ public class Interface {
     }
 
         //imprimindo uma peça, verificando sua  cor
-        private static void imprimirPeca (PecaXadrez peca, boolean fundo){
+        private static void imprimirPeca (PecaXadrez peca, boolean fundo) {
             if (fundo) { // testando se a variavel(fundo) é verdadeira
                 System.out.print(ANSI_BLUE_BACKGROUND);
             }
@@ -99,5 +103,18 @@ public class Interface {
                 }
             }
             System.out.print(" ");
+        }
+        private static void imprimirPecasCapturadas(List<PecaXadrez> capturada){ // imprimindo lista de pecas capturadas
+            List<PecaXadrez>  white = capturada.stream().filter(x -> x.getCor() == Cor.WHITE).collect(Collectors.toList());
+            List<PecaXadrez> black = capturada.stream().filter(x -> x.getCor() == Cor.BLACK).collect(Collectors.toList());
+            System.out.println("Pecas Capturadas:");
+            System.out.print("Brancas: ");
+            System.out.print(ANSI_WHITE);
+            System.out.println(Arrays.toString(white.toArray()));//imprimindo a lista
+            System.out.print(ANSI_RESET);
+            System.out.print("Pretas: ");
+            System.out.print(ANSI_YELLOW);
+            System.out.println(Arrays.toString(black.toArray()));
+            System.out.print(ANSI_RESET);
         }
     }

@@ -6,12 +6,17 @@ import tabuleiro.Tabuleiro;
 import xadrez.pecas.Rei;
 import xadrez.pecas.Torre;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //É onde tera as regras do jogo
 
 public class PartidaXadrez {
     private int turno;
     private Cor jogadorAtual;
     private Tabuleiro tabuleiro; //importar tabuleiro aqui
+    private List<Peca> pecasNoTabuleiro = new ArrayList<>(); // lista de pecas no tabuleiro
+    private List<Peca> pecasCapturada = new ArrayList<>();// lista de pecas capturadas
 
     public PartidaXadrez() {
         tabuleiro = new Tabuleiro(8, 8); //dimensão do tabuleiro
@@ -58,9 +63,15 @@ public class PartidaXadrez {
     // removendo pecas
     public Peca movendoPeca(Posicao origem, Posicao destino) {
         Peca p = tabuleiro.removePeca(origem); // removendo peca de origem
-        Peca capturaPreca = tabuleiro.removePeca(destino); // removendo possivel peca de origem
-        tabuleiro.entradaPeca(p, destino); // colocando a peca na posicao de destino
-        return capturaPreca;
+        Peca pecaCapturada = tabuleiro.removePeca(destino); // removendo possivel peca de destino
+        tabuleiro.entradaPeca(p, destino); // colocando a peca na posicao de destino a peca que estava na posicao de origem
+
+        if (pecaCapturada != null) {
+            pecasNoTabuleiro.remove(pecaCapturada); // removendo peca desta lista
+            pecasCapturada.add(pecaCapturada); // adicionando em pecas capturadas
+        }
+
+        return pecaCapturada;
     }
 
     // verificando se existe peca na posicao de origem
@@ -91,7 +102,8 @@ public class PartidaXadrez {
         //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
         private void entradaNovaPeca( char coluna, int linha, PecaXadrez peca){
             tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
-        }
+            pecasNoTabuleiro.add(peca); // colocando peca na lista
+    }
 
 
         // colocando as pecas no tabuleiro
