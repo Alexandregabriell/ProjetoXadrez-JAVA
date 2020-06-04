@@ -63,6 +63,10 @@ public class Interface {
         imprimirPecasCapturadas(capturada); // imprimindo pecas capturadas
         System.out.println("Turno : " + partidaXadrez.getTurno());
         System.out.println("Aguardando o Jogador : " + partidaXadrez.getJogadorAtual());
+
+        if (partidaXadrez.getCheck()) {
+            System.out.println("CHECK!");
+        }
     }
 
         public static void imprimirTabuleiro (PecaXadrez[][] pecas){

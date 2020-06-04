@@ -8,7 +8,7 @@ import tabuleiro.Tabuleiro;
         public abstract class PecaXadrez extends Peca { //subclasse de Peca
         private Cor cor; //atributo da classe
 
-        //contrutor
+        //construtor
         public PecaXadrez(Tabuleiro tabuleiro, Cor cor){
                 super(tabuleiro); // chamada para o construtor da super classe
                 this.cor = cor;
@@ -16,6 +16,10 @@ import tabuleiro.Tabuleiro;
 
         public Cor getCor(){
                 return cor;
+        }
+
+        public posicaoXadrez getPosicaoXadrez() {
+                return posicaoXadrez.fromPosicao(posicao);
         }
 
         protected boolean pecaOponente(Posicao posicao) {

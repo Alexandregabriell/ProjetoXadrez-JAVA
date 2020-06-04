@@ -8,6 +8,7 @@ import xadrez.pecas.Torre;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //É onde tera as regras do jogo
 
@@ -15,6 +16,8 @@ public class PartidaXadrez {
     private int turno;
     private Cor jogadorAtual;
     private Tabuleiro tabuleiro; //importar tabuleiro aqui
+    private boolean check;
+
     private List<Peca> pecasNoTabuleiro = new ArrayList<>(); // lista de pecas no tabuleiro
     private List<Peca> pecasCapturada = new ArrayList<>();// lista de pecas capturadas
 
@@ -31,6 +34,10 @@ public class PartidaXadrez {
 
     public Cor getJogadorAtual() {
         return jogadorAtual;
+    }
+
+    public boolean getCheck() {
+        return check;
     }
 
     public PecaXadrez[][] getPecas() { // retorna uma matriz de peças
@@ -56,6 +63,14 @@ public class PartidaXadrez {
         validaPosicaoOrigem(origem);//validando posicao de origem
         validaPosicaoDestino(origem, destino);
         Peca capturaPeca = movendoPeca(origem, destino); //recebe resultado da operaca movendo peca, que vai realizar o movimento da peca
+
+        if (testCheck(jogadorAtual)) {
+            desfazerMoviemnto(origem, destino, capturaPeca);
+            throw new excecaoXadrez(" VOCE NAO PODE SE COLOCAR EM CHECK ");
+        }
+
+        check = (testCheck(oponente(jogadorAtual))) ? true : false;
+
         proximoTurno();
         return (PecaXadrez) capturaPeca;
     }
@@ -74,12 +89,23 @@ public class PartidaXadrez {
         return pecaCapturada;
     }
 
+    private void desfazerMoviemnto(Posicao origem, Posicao destino, Peca pecaCapturada) {
+        Peca p = tabuleiro.removePeca(destino);
+        tabuleiro.entradaPeca(p, origem);
+
+        if (pecaCapturada != null) {
+            tabuleiro.entradaPeca(pecaCapturada, destino);
+            pecasCapturada.remove(pecaCapturada);
+            pecasNoTabuleiro.add(pecaCapturada);
+        }
+    }
+
     // verificando se existe peca na posicao de origem
     private void validaPosicaoOrigem(Posicao posicao) {
         if (!tabuleiro.posicaoOcupada(posicao)) {
             throw new excecaoXadrez(" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
         }
-        if (jogadorAtual != ((PecaXadrez)tabuleiro.peca(posicao)).getCor()) {
+        if (jogadorAtual != ((PecaXadrez) tabuleiro.peca(posicao)).getCor()) {
             throw new excecaoXadrez(" A PECA ESCOLHIDA É DO ADVERSARIO");
         }
 
@@ -99,29 +125,55 @@ public class PartidaXadrez {
         jogadorAtual = (jogadorAtual == Cor.WHITE) ? Cor.BLACK : Cor.WHITE; // condicao ternaria, trocando cor
     }
 
-        //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
-        private void entradaNovaPeca( char coluna, int linha, PecaXadrez peca){
-            tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
-            pecasNoTabuleiro.add(peca); // colocando peca na lista
+    private Cor oponente(Cor cor) {
+        return (cor == Cor.WHITE) ? Cor.BLACK : Cor.WHITE;
     }
 
-
-        // colocando as pecas no tabuleiro
-        //instanciando as pecas de xadrez
-        private void iniciarPartida () {
-            // posicao das pecas na posicao do xadrez
-            entradaNovaPeca('c', 1, new Torre(tabuleiro, Cor.WHITE));
-            entradaNovaPeca('c', 2, new Torre(tabuleiro, Cor.WHITE));
-            entradaNovaPeca('d', 2, new Torre(tabuleiro, Cor.WHITE));
-            entradaNovaPeca('e', 2, new Torre(tabuleiro, Cor.WHITE));
-            entradaNovaPeca('e', 1, new Torre(tabuleiro, Cor.WHITE));
-            entradaNovaPeca('d', 1, new Rei(tabuleiro, Cor.WHITE));
-
-            entradaNovaPeca('c', 7, new Torre(tabuleiro, Cor.BLACK));
-            entradaNovaPeca('c', 8, new Torre(tabuleiro, Cor.BLACK));
-            entradaNovaPeca('d', 7, new Torre(tabuleiro, Cor.BLACK));
-            entradaNovaPeca('e', 7, new Torre(tabuleiro, Cor.BLACK));
-            entradaNovaPeca('e', 8, new Torre(tabuleiro, Cor.BLACK));
-            entradaNovaPeca('d', 8, new Rei(tabuleiro, Cor.BLACK));
+    private PecaXadrez rei(Cor cor) {
+        List<Peca> list = pecasNoTabuleiro.stream().filter(x -> ((PecaXadrez)x).getCor() == cor).collect(Collectors.toList());
+        for (Peca p : list) {
+            if (p instanceof Rei) {
+                return (PecaXadrez) p;
+            }
         }
+        throw new IllegalStateException("Não a Rei " + cor + " no Tabuleiro");
     }
+
+    private boolean testCheck(Cor cor) {
+        Posicao posicaoRei = rei(cor).getPosicaoXadrez().toPosicao();
+        List<Peca> pecasOponente = pecasNoTabuleiro.stream().filter(x -> ((PecaXadrez)x).getCor() == oponente(cor)).collect(Collectors.toList());
+        for (Peca p : pecasOponente) {
+            boolean[][] mat = p.possivelMovimento();
+            if (mat[posicaoRei.getlinha()][posicaoRei.getcoluna()]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
+    private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
+        tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
+        pecasNoTabuleiro.add(peca); // colocando peca na lista
+    }
+
+
+    // colocando as pecas no tabuleiro
+    //instanciando as pecas de xadrez
+    private void iniciarPartida() {
+        // posicao das pecas na posicao do xadrez
+        entradaNovaPeca('c', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('c', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 2, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 1, new Rei(tabuleiro, Cor.WHITE));
+
+        entradaNovaPeca('c', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('c', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 7, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 8, new Rei(tabuleiro, Cor.BLACK));
+    }
+}
