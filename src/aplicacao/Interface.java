@@ -4,7 +4,7 @@ package aplicacao;
 import xadrez.Cor;
 import xadrez.PartidaXadrez;
 import xadrez.PecaXadrez;
-import xadrez.posicaoXadrez;
+import xadrez.PosicaoXadrez;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
@@ -44,15 +44,15 @@ public class Interface {
     }
 
     // metodo para ler posicao do usuario
-    public static posicaoXadrez lendoPosicaoXadrez(Scanner sc) { // Recebe como argumento o scanner instaciado do programa principal
+    public static PosicaoXadrez lendoPosicaoXadrez(Scanner sc) { // Recebe como argumento o scanner instaciado do programa principal
         try { // evitando problema de formato
             // lendo posicao do xadrez
             String s = sc.nextLine();
-            char coluna = s.charAt(0);
+            char coluna = s.charAt(0);// onde é inserido o caracter
             int linha = Integer.parseInt(s.substring(1));// recortando string apartir da posicao 1
-            return new posicaoXadrez(coluna, linha);
+            return new PosicaoXadrez(coluna, linha);
         }
-        catch (RuntimeException e){ // excecao, erro entrada de dados
+        catch (RuntimeException e) { // excecao, erro entrada de dados
             throw new InputMismatchException(" ERRO NA POSICAO DE XADREZ - VALORES VALIDOS DE A1 ATÉ H8.");
         }
     }
@@ -61,13 +61,21 @@ public class Interface {
         imprimirTabuleiro(partidaXadrez.getPecas());// imprimindo o tabuleiro
         System.out.println();
         imprimirPecasCapturadas(capturada); // imprimindo pecas capturadas
+        System.out.println();
         System.out.println("Turno : " + partidaXadrez.getTurno());
-        System.out.println("Aguardando o Jogador : " + partidaXadrez.getJogadorAtual());
 
+        if (!partidaXadrez.getCheckMate()) {
+            System.out.println("Aguardando o Jogador: " + partidaXadrez.getJogadorAtual());
         if (partidaXadrez.getCheck()) {
             System.out.println("CHECK!");
         }
     }
+    else{
+        System.out.println("CHECKMATE!");
+        System.out.println("VENCEDOR: " + partidaXadrez.getJogadorAtual());
+    }
+
+}
 
         public static void imprimirTabuleiro (PecaXadrez[][] pecas){
             for (int i = 0; i < pecas.length; i++) { //percorrer a matriz para imprimir tabuleiro
@@ -99,7 +107,8 @@ public class Interface {
 
             if (peca == null) {
                 System.out.print("-" + ANSI_RESET);
-            } else {
+            }
+            else {
                 if (peca.getCor() == Cor.WHITE) {
                     System.out.print(ANSI_WHITE + peca + ANSI_RESET);
                 } else {
@@ -109,7 +118,7 @@ public class Interface {
             System.out.print(" ");
         }
         private static void imprimirPecasCapturadas(List<PecaXadrez> capturada){ // imprimindo lista de pecas capturadas
-            List<PecaXadrez>  white = capturada.stream().filter(x -> x.getCor() == Cor.WHITE).collect(Collectors.toList());
+            List<PecaXadrez> white = capturada.stream().filter(x -> x.getCor() == Cor.WHITE).collect(Collectors.toList());
             List<PecaXadrez> black = capturada.stream().filter(x -> x.getCor() == Cor.BLACK).collect(Collectors.toList());
             System.out.println("Pecas Capturadas:");
             System.out.print("Brancas: ");
