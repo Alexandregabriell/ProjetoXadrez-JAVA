@@ -3,8 +3,7 @@ package xadrez;
 import tabuleiro.Peca;
 import tabuleiro.Posicao;
 import tabuleiro.Tabuleiro;
-import xadrez.pecas.Rei;
-import xadrez.pecas.Torre;
+import xadrez.pecas.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +14,12 @@ import java.util.stream.Collectors;
 public class PartidaXadrez {
     private int turno;
     private Cor jogadorAtual;
-    private Tabuleiro tabuleiro; //importar tabuleiro aqui
+    private final Tabuleiro tabuleiro; //importar tabuleiro aqui
     private boolean check;
+    private boolean checkMate;
 
-    private List<Peca> pecasNoTabuleiro = new ArrayList<>(); // lista de pecas no tabuleiro
-    private List<Peca> pecasCapturada = new ArrayList<>();// lista de pecas capturadas
+    private final List<Peca> pecasNoTabuleiro = new ArrayList<>(); // lista de pecas no tabuleiro
+    private final List<Peca> pecasCapturada = new ArrayList<>();// lista de pecas capturadas
 
     public PartidaXadrez() {
         tabuleiro = new Tabuleiro(8, 8); //dimensão do tabuleiro
@@ -40,6 +40,10 @@ public class PartidaXadrez {
         return check;
     }
 
+    public boolean getCheckMate() {
+        return checkMate;
+    }
+
     public PecaXadrez[][] getPecas() { // retorna uma matriz de peças
         PecaXadrez[][] mat = new PecaXadrez[tabuleiro.getLinhas()][tabuleiro.getColunas()];
         for (int i = 0; i < tabuleiro.getLinhas(); i++) {//percorrendo as linhas da matriz
@@ -50,34 +54,41 @@ public class PartidaXadrez {
         return mat;
     }
 
-    public boolean[][] possivelMovimento(posicaoXadrez origemPosicao) {
+    public boolean[][] possivelMovimento(PosicaoXadrez origemPosicao) {
         Posicao posicao = origemPosicao.toPosicao(); // posicao de matriz normal
         validaPosicaoOrigem(posicao); // validando posicao de origem
         return tabuleiro.peca(posicao).possivelMovimento(); // retorna possivel movimento da peca escolhida
     }
 
     // Metodo para retirar a peca da posicao de origem e colocar na posicao de destino
-    public PecaXadrez movimentoXadrez(posicaoXadrez origemPosicao, posicaoXadrez destinoPosicao) {
+    public PecaXadrez movimentoXadrez(PosicaoXadrez origemPosicao, PosicaoXadrez destinoPosicao) {
         Posicao origem = origemPosicao.toPosicao();// convertendo para posicao da matriz
         Posicao destino = destinoPosicao.toPosicao();
         validaPosicaoOrigem(origem);//validando posicao de origem
         validaPosicaoDestino(origem, destino);
-        Peca capturaPeca = movendoPeca(origem, destino); //recebe resultado da operaca movendo peca, que vai realizar o movimento da peca
+        Peca pecaCapturada = movendoPeca(origem, destino); //recebe resultado da operaca movendo peca, que vai realizar o movimento da peca
 
-        if (testCheck(jogadorAtual)) {
-            desfazerMoviemnto(origem, destino, capturaPeca);
-            throw new excecaoXadrez(" VOCE NAO PODE SE COLOCAR EM CHECK ");
+        if (testCheck(jogadorAtual)) { // testando se o jogador atual ficou em check
+            desfazerMovimento(origem, destino, pecaCapturada);
+            throw new ExcecaoXadrez(" VOCE NAO PODE SE COLOCAR EM CHECK ");
         }
 
-        check = (testCheck(oponente(jogadorAtual))) ? true : false;
+        check = (testCheck(oponente(jogadorAtual))) ? true : false; // testando se o oponente ficou em check
 
-        proximoTurno();
-        return (PecaXadrez) capturaPeca;
+        if (testCheckMate(oponente(jogadorAtual))) {
+            checkMate = true;
+        }
+        else {
+            proximoTurno();
+        }
+
+        return (PecaXadrez)pecaCapturada;
     }
 
     // removendo pecas
     public Peca movendoPeca(Posicao origem, Posicao destino) {
-        Peca p = tabuleiro.removePeca(origem); // removendo peca de origem
+        PecaXadrez p = (PecaXadrez) tabuleiro.removePeca(origem); // removendo peca de origem
+        p.incrementoMoveCount(); // contador para aumentar o movimento
         Peca pecaCapturada = tabuleiro.removePeca(destino); // removendo possivel peca de destino
         tabuleiro.entradaPeca(p, destino); // colocando a peca na posicao de destino a peca que estava na posicao de origem
 
@@ -89,8 +100,9 @@ public class PartidaXadrez {
         return pecaCapturada;
     }
 
-    private void desfazerMoviemnto(Posicao origem, Posicao destino, Peca pecaCapturada) {
-        Peca p = tabuleiro.removePeca(destino);
+    private void desfazerMovimento(Posicao origem, Posicao destino, Peca pecaCapturada) {
+        PecaXadrez p = (PecaXadrez) tabuleiro.removePeca(destino);
+        p.decrementoMoveCount(); // contador para diminuir um movimento
         tabuleiro.entradaPeca(p, origem);
 
         if (pecaCapturada != null) {
@@ -103,20 +115,20 @@ public class PartidaXadrez {
     // verificando se existe peca na posicao de origem
     private void validaPosicaoOrigem(Posicao posicao) {
         if (!tabuleiro.posicaoOcupada(posicao)) {
-            throw new excecaoXadrez(" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
+            throw new ExcecaoXadrez(" NÃO EXISTE PECA NA POSICAO DE ORIGEM ");
         }
         if (jogadorAtual != ((PecaXadrez) tabuleiro.peca(posicao)).getCor()) {
-            throw new excecaoXadrez(" A PECA ESCOLHIDA É DO ADVERSARIO");
+            throw new ExcecaoXadrez(" A PECA ESCOLHIDA É DO ADVERSARIO");
         }
 
         if (!tabuleiro.peca(posicao).existeMovimentoPossivel()) { // testando se ha movimentos possiveis para a peca escolhida
-            throw new excecaoXadrez(" Não existe movimentos possíveis para a peça escolhida. ");
+            throw new ExcecaoXadrez(" Não existe movimentos possíveis para a peça escolhida. ");
         }
     }
 
     private void validaPosicaoDestino(Posicao origem, Posicao destino) {
         if (!tabuleiro.peca(origem).possivelMovimento(destino)) {
-            throw new excecaoXadrez(" A peça selecionada não pode ser movida para a posição escolhida. ");
+            throw new ExcecaoXadrez(" A peça selecionada não pode ser movida para a posição escolhida. ");
         }
     }
 
@@ -151,29 +163,73 @@ public class PartidaXadrez {
         return false;
     }
 
-    //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
-    private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
-        tabuleiro.entradaPeca(peca, new posicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
-        pecasNoTabuleiro.add(peca); // colocando peca na lista
+    private boolean testCheckMate(Cor cor) {
+        if (!testCheck(cor)) {
+            return false;
+        }
+        List<Peca> list = pecasNoTabuleiro.stream().filter(x -> ((PecaXadrez)x).getCor() == cor).collect(Collectors.toList());
+        for (Peca p : list) {
+            boolean[][] mat = p.possivelMovimento();
+            for (int i=0; i<tabuleiro.getLinhas(); i++) {
+                for (int j=0; j<tabuleiro.getColunas(); j++) {
+                    if (mat[i][j]) {
+                        Posicao origem = ((PecaXadrez)p).getPosicaoXadrez().toPosicao();
+                        Posicao destino = new Posicao(i, j);
+                        Peca pecaCapturada = movendoPeca(origem, destino);
+                        boolean testCheck = testCheck(cor);
+                        desfazerMovimento(origem, destino, pecaCapturada);
+                        if (!testCheck) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
+    //metodo para intanciar as coordenadas do xadrez[coluna][linha], e nao da matriz[linha][coluna]
+    private void entradaNovaPeca(char coluna, int linha, PecaXadrez peca) {
+        tabuleiro.entradaPeca(peca, new PosicaoXadrez(coluna, linha).toPosicao());//instanciando com os novos dados e convertendo para a posicao de matriz
+        pecasNoTabuleiro.add(peca); // colocando peca na lista
+    }
 
     // colocando as pecas no tabuleiro
     //instanciando as pecas de xadrez
     private void iniciarPartida() {
         // posicao das pecas na posicao do xadrez
-        entradaNovaPeca('c', 1, new Torre(tabuleiro, Cor.WHITE));
-        entradaNovaPeca('c', 2, new Torre(tabuleiro, Cor.WHITE));
-        entradaNovaPeca('d', 2, new Torre(tabuleiro, Cor.WHITE));
-        entradaNovaPeca('e', 2, new Torre(tabuleiro, Cor.WHITE));
-        entradaNovaPeca('e', 1, new Torre(tabuleiro, Cor.WHITE));
-        entradaNovaPeca('d', 1, new Rei(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('a', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('b', 1, new Cavalo(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('c', 1, new Bispo(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 1, new Rainha(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 1, new Rei(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('f', 1, new Bispo(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('g', 1, new Cavalo(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('h', 1, new Torre(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('a', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('b', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('c', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('d', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('e', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('f', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('g', 2, new Peao(tabuleiro, Cor.WHITE));
+        entradaNovaPeca('h', 2, new Peao(tabuleiro, Cor.WHITE));
 
-        entradaNovaPeca('c', 7, new Torre(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('c', 8, new Torre(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('d', 7, new Torre(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('e', 7, new Torre(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('e', 8, new Torre(tabuleiro, Cor.BLACK));
-        entradaNovaPeca('d', 8, new Rei(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('a', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('b', 8, new Cavalo(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('c', 8, new Bispo(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 8, new Rainha(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 8, new Rei(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('f', 8, new Bispo(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('g', 8, new Cavalo(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('h', 8, new Torre(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('a', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('b', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('c', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('d', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('e', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('f', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('g', 7, new Peao(tabuleiro, Cor.BLACK));
+        entradaNovaPeca('h', 7, new Peao(tabuleiro, Cor.BLACK));
     }
 }

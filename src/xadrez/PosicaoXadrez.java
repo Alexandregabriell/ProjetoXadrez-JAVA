@@ -2,21 +2,18 @@ package xadrez;
 
 import tabuleiro.Posicao;
 
-import javax.swing.text.Position;
-
-public class posicaoXadrez {
+public class PosicaoXadrez {
     private char coluna;
     private int linha;
 
-    public posicaoXadrez(char coluna, int linha) {
+    public PosicaoXadrez(char coluna, int linha) {
         //programacao defensiva
         if (coluna < 'a' || coluna > 'h' || linha < 1 || linha > 8){
-            throw new excecaoXadrez(" ERRO NA POSICAO DE XADREZ - VALORES VALIDOS DE A1 ATÉ H8.");
+            throw new ExcecaoXadrez(" ERRO NA POSICAO DE XADREZ - VALORES VALIDOS DE A1 ATÉ H8.");
         }
         this.coluna = coluna;
         this.linha = linha;
     }
-
 
     public char getColuna() {
         return coluna;
@@ -37,13 +34,13 @@ public class posicaoXadrez {
     }
 
     //implementando posicao inversa da matriz
-    protected static posicaoXadrez fromPosicao(Posicao posicao){// retornando  a formula inversa de Posicao
-        return new posicaoXadrez((char)('a' - posicao.getcoluna()), 8 - posicao.getlinha());
+    protected static PosicaoXadrez fromPosicao(Posicao posicao){// retornando  a formula inversa de Posicao
+        return new PosicaoXadrez((char)('a' + posicao.getcoluna()), 8 - posicao.getlinha());
     }
 
     //imprimindo posicao do xadrez na ordem
     @Override //concatenacao de strings ("") automatica
     public String toString(){
-        return "" + coluna + linha;
+        return " " + coluna + linha;
     }
 }
